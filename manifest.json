@@ -1,0 +1,10 @@
+{
+  "manifest_version": 3,
+  "name": "GH New Sidebar",
+  "version": "0.1.0",
+  "description": "Check a GitHub repository name before opening New Repository.",
+  "permissions": ["sidePanel", "storage"],
+  "host_permissions": ["https://api.github.com/*", "https://github.com/*"],
+  "action": { "default_title": "GH New" },
+  "side_panel": { "default_path": "index.html" }
+}
