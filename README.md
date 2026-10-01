@@ -1,48 +1,21 @@
 # ghnew-sidebar-crx
 
-GitHub の New Repository を置き換える Side Panel CRX。
+GitHub の **検索** と **新規 Repository 作成**だけを行う Side Panel CRX。
 
-## MVP
+## Flow
 
-```
-repo name
-   ↓
-HTMX /check
-   ↓
-available ──→ New Repository
-exists    ──→ 既存repoを表示
-invalid   ──→ 入力修正
-```
+- 検索 → GitHub の検索結果をメインペインで開く
+- repo名 → REST APIで同名チェック
+- available → 同じSide PanelからREST APIで作成
+- 作成後 → 作成したrepoをメインペインで開く
 
-### 原則
+GitHub API のJSONをブラウザで取得し、Side Panelの最小UIに反映する。
 
-- repo を作る前に必ず同名チェック
-- provisional name を許容
-- チェック結果を見てから GitHub New に進む
-- UI は HTMX の partial response を中心にする
-- GitHub API の認証情報を CRX に固定保存しない
+## Authentication
 
-## API contract
+新規作成時にGitHub tokenを一度だけ入力する。
+tokenは chrome.storage.local に保存する。
 
-`GET /check?owner=bonsai&name=example`
+## Scope
 
-Response:
-
-```html
-<span class="status available">✓ available</span>
-```
-
-or
-
-```html
-<span class="status exists">⚠ already exists</span>
-<a href="https://github.com/bonsai/example">Open repository</a>
-```
-
-## Next
-
-1. HTMX partial endpoint
-2. GitHub existence check
-3. Side Panel manifest
-4. New Repository handoff
-5. search/chat/idea flow
+検索と新規作成以外は実装しない。
