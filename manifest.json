@@ -1,10 +1,1 @@
-{
-  "manifest_version": 3,
-  "name": "GH New Sidebar",
-  "version": "0.1.0",
-  "description": "Check a GitHub repository name before opening New Repository.",
-  "permissions": ["sidePanel", "storage"],
-  "host_permissions": ["https://api.github.com/*", "https://github.com/*"],
-  "action": { "default_title": "GH New" },
-  "side_panel": { "default_path": "index.html" }
-}
+{"manifest_version":3,"name":"GH Mini","version":"0.2.0","description":"GitHub search and repository creation in a Side Panel.","permissions":["sidePanel","storage","tabs"],"host_permissions":["https://api.github.com/*","https://github.com/*"],"action":{"default_title":"GH Mini"},"side_panel":{"default_path":"index.html"}}
