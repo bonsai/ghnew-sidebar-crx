@@ -1,23 +1,11 @@
 <!doctype html>
-<html lang="ja">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>GH New</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <main>
-    <header><strong>🌱 GH New</strong><small>repo first, then new</small></header>
-    <label>Owner
-      <input id="owner" value="bonsai" autocomplete="off">
-    </label>
-    <label>Repository name
-      <input id="repo-name" name="name" placeholder="my-new-idea" autocomplete="off">
-    </label>
-    <div id="status" class="status">名前を入力するとチェックします</div>
-    <button id="new" disabled>New Repository</button>
-  </main>
-  <script src="app.js"></script>
-</body>
-</html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>GH Mini</title><link rel="stylesheet" href="style.css"></head>
+<body><main>
+<input id="search" placeholder="GitHubを検索…" autocomplete="off"><button id="search-button" type="button">検索</button>
+<div class="divider"></div>
+<form id="new-form">
+<input id="repo-name" name="name" placeholder="新しいrepo名" autocomplete="off">
+<input id="description" name="description" placeholder="説明（任意）" autocomplete="off">
+<label class="check"><input id="private" type="checkbox"> private</label>
+<div id="status" class="status"></div><button id="create" type="submit" disabled>新規作成</button>
+</form></main><script src="app.js"></script></body></html>
