@@ -1,42 +1,10 @@
-const owner = document.querySelector("#owner");
-const name = document.querySelector("#repo-name");
-const status = document.querySelector("#status");
-const button = document.querySelector("#new");
-
+const OWNER="bonsai";
+const searchInput=document.querySelector("#search"),searchButton=document.querySelector("#search-button"),nameInput=document.querySelector("#repo-name"),descriptionInput=document.querySelector("#description"),privateInput=document.querySelector("#private"),status=document.querySelector("#status"),createButton=document.querySelector("#create");
 let timer;
-name.addEventListener("input", () => {
-  clearTimeout(timer);
-  button.disabled = true;
-  const value = name.value.trim();
-  if (!value) {
-    status.textContent = "名前を入力するとチェックします";
-    return;
-  }
-  timer = setTimeout(() => checkName(owner.value.trim(), value), 350);
-});
-
-async function checkName(owner, name) {
-  status.textContent = "checking…";
-  try {
-    const response = await fetch(
-      `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(name)}`
-    );
-    if (response.status === 404) {
-      status.innerHTML = '<span class="available">✓ available</span>';
-      button.disabled = false;
-      button.onclick = () => {
-        location.href = `https://github.com/new?name=${encodeURIComponent(name)}`;
-      };
-      return;
-    }
-    if (response.ok) {
-      status.innerHTML =
-        '<span class="exists">⚠ already exists</span>';
-      button.disabled = true;
-      return;
-    }
-    status.textContent = `check failed: ${response.status}`;
-  } catch (error) {
-    status.textContent = "check failed";
-  }
-}
+searchButton.addEventListener("click",search);
+searchInput.addEventListener("keydown",e=>{if(e.key==="Enter")search()});
+async function search(){const q=searchInput.value.trim();if(!q)return;const url="https://github.com/search?q="+encodeURIComponent(q)+"&type=repositories";const [tab]=await chrome.tabs.query({active:true,currentWindow:true});if(tab?.id)await chrome.tabs.update(tab.id,{url})}
+nameInput.addEventListener("input",()=>{clearTimeout(timer);createButton.disabled=true;const name=nameInput.value.trim();if(!name){status.textContent="";return}timer=setTimeout(()=>checkName(name),300)});
+async function githubFetch(url,options={}){const token=await chrome.storage.local.get("github_token");const headers={Accept:"application/vnd.github+json",...options.headers};if(token.github_token)headers.Authorization="Bearer "+token.github_token;return fetch(url,{...options,headers})}
+async function checkName(name){status.textContent="checking…";try{const r=await githubFetch("https://api.github.com/repos/"+encodeURIComponent(OWNER)+"/"+encodeURIComponent(name));if(r.status===404){status.textContent="✓ available";status.className="status available";createButton.disabled=false;return}if(r.ok){status.textContent="⚠ already exists";status.className="status exists";return}status.textContent="check failed";status.className="status"}catch{status.textContent="check failed";status.className="status"}}
+document.querySelector("#new-form").addEventListener("submit",async e=>{e.preventDefault();const name=nameInput.value.trim();if(!name||createButton.disabled)return;let {github_token:token}=await chrome.storage.local.get("github_token");if(!token){token=window.prompt("GitHub token");if(!token)return;await chrome.storage.local.set({github_token:token.trim()})}createButton.disabled=true;status.textContent="creating…";status.className="status";try{const r=await fetch("https://api.github.com/user/repos",{method:"POST",headers:{Accept:"application/vnd.github+json",Authorization:"Bearer "+token.trim(),"Content-Type":"application/json"},body:JSON.stringify({name,description:descriptionInput.value.trim(),private:privateInput.checked,auto_init:true})});const data=await r.json();if(!r.ok)throw new Error(data.message||"create failed");status.textContent="✓ created";status.className="status available";nameInput.value="";descriptionInput.value="";privateInput.checked=false;const [tab]=await chrome.tabs.query({active:true,currentWindow:true});if(tab?.id&&data.html_url)await chrome.tabs.update(tab.id,{url:data.html_url})}catch(error){status.textContent=error.message||"create failed";status.className="status exists";createButton.disabled=false}});
