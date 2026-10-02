@@ -23,10 +23,10 @@ for (const pattern of [
   'chrome.storage.local',
   'https://api.github.com/repos/',
   'https://api.github.com/user/repos',
-  'type="submit"',
 ]) {
   assert.ok(app.includes(pattern), `missing app behavior: ${pattern}`);
 }
+assert.match(html, /type="submit"/);
 
 assert.match(app, /encodeURIComponent\(q\)/);
 assert.match(app, /r\.status===404/);
