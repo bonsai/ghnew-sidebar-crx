@@ -36,27 +36,27 @@ jobs:
           test_rc=$?
 
           runs_json="$(gh run list --repo "${GITHUB_REPOSITORY}" --limit 10 --json databaseId,name,status,conclusion,headSha,url,event)"
-          failed_run="$(printf "%s" "$runs_json" | jq -r '[.[] | select(.conclusion=="failure")] | .[0] // empty')"
+          failed_run="$(printf "%s" "$runs_json" | jq -r '[.[] | select(.conclusion=="failure" and .name!="debug-issues")] | .[0] // empty')"
 
           debug_report="/tmp/debug-report.md"
           {
             echo "## Automated debug report"
             echo
-            echo "- Workflow: `debug-issues`"
-            echo "- Commit: `${GITHUB_SHA}`"
-            echo "- Event: `${GITHUB_EVENT_NAME}`"
+            echo "- Workflow: debug-issues"
+            echo "- Commit: ${GITHUB_SHA}"
+            echo "- Event: ${GITHUB_EVENT_NAME}"
             echo
             echo "### Local reproduction"
             echo
             if [[ $syntax_rc -eq 0 ]]; then
-              echo "- `node --check app.js`: **success**"
+              echo "- node --check app.js: **success**"
             else
-              echo "- `node --check app.js`: **failure**"
+              echo "- node --check app.js: **failure**"
             fi
             if [[ $test_rc -eq 0 ]]; then
-              echo "- `node tests/smoke.mjs`: **success**"
+              echo "- node tests/smoke.mjs: **success**"
             else
-              echo "- `node tests/smoke.mjs`: **failure**"
+              echo "- node tests/smoke.mjs: **failure**"
             fi
             echo
             echo "### Test output"
@@ -74,7 +74,7 @@ jobs:
               failed_job_id="$(printf "%s" "$jobs" | jq -r '[.jobs[] | select(.conclusion=="failure")] | .[0].id // empty')"
               failed_job_name="$(printf "%s" "$jobs" | jq -r '[.jobs[] | select(.conclusion=="failure")] | .[0].name // empty')"
               if [[ -n "$failed_job_id" ]]; then
-                echo "- Job: `${failed_job_name}`"
+                echo "- Job: ${failed_job_name}"
                 echo
                 echo '```text'
                 gh api "repos/${GITHUB_REPOSITORY}/actions/jobs/${failed_job_id}/logs" 2>/dev/null | tail -n 120
