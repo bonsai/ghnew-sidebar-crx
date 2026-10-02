@@ -24,7 +24,7 @@ jobs:
           set -uo pipefail
 
           if [[ "${{ github.event_name }}" == "issues" ]]; then
-            issues_json="[$(gh api "repos/${GITHUB_REPOSITORY}/issues/${{ github.event.issue.number }}")]")
+            issues_json="[$(gh api "repos/${GITHUB_REPOSITORY}/issues/${{ github.event.issue.number }}")]"
           else
             issues_json="$(gh api --paginate "repos/${GITHUB_REPOSITORY}/issues?state=open&per_page=100")"
           fi
