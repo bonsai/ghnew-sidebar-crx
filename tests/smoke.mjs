@@ -32,3 +32,5 @@ assert.match(app, /encodeURIComponent\(q\)/);
 assert.match(app, /r\.status===404/);
 assert.match(app, /private:privateInput\.checked/);
 console.log("✓ ghnew-sidebar-crx smoke tests passed");
+
+// intentional debug trigger
