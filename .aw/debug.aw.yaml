@@ -2,7 +2,7 @@ version: "0.1"
 name: issue-debug
 goal: >-
   Open GitHub issues and recent Actions failuresを取得し、
-  再現テストと失敗ログをIssueへ記録してデバッグ可能な状態にする。
+  再現テスト・失敗ログ・修正コミットまで一連で処理する。
 context: >-
   GitHub is the canonical task record. Issue本文を入力として扱い、
   Actionsの実行結果を証拠としてIssueへ戻す。
@@ -10,10 +10,13 @@ prompt: >-
   Open issuesを取得する。各Issueについて現在のテストを実行し、
   最新の失敗したActions runがあればjob/logを取得する。
   推測ではなくIssue本文・テスト結果・Actionsログを根拠として
-  デバッグレポートをIssueコメントへ記録する。
+  修正方針を決定し、Issue本文の受入条件に一致する最小修正を行い、
+  testを通してcommitする。修正内容とcommit SHAをIssueへ記録する。
 constraints:
   - Issue本文を勝手に書き換えない
-  - コードを自動変更しない
+  - 修正はIssue本文と失敗テストで直接証明できる最小変更に限定する
+  - testが成功しない修正はcommitしない
+  - 同じ失敗を修正済みなら二重commitしない
   - 推測と観測結果を混同しない
   - 巨大なログをIssueへ貼らず末尾の関連部分だけを記録する
   - GitHub Actionsの権限は必要最小限にする
@@ -23,9 +26,11 @@ tools:
   - github.actions.jobs.list
   - github.actions.jobs.logs
   - github.issue.comment
+  - github.contents.write
 success:
   - Open issues are discovered from the repository
   - Test and syntax results are recorded for each target issue
   - Latest failed Actions evidence is recorded when available
   - A reproducible debug report is posted back to the issue
-  - No source files are modified by the debug workflow
+  - A minimal verified fix is committed when the issue is actionable
+  - The resulting commit SHA is recorded on the issue
