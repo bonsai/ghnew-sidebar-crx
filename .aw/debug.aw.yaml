@@ -1,0 +1,31 @@
+version: "0.1"
+name: issue-debug
+goal: >-
+  Open GitHub issues and recent Actions failuresを取得し、
+  再現テストと失敗ログをIssueへ記録してデバッグ可能な状態にする。
+context: >-
+  GitHub is the canonical task record. Issue本文を入力として扱い、
+  Actionsの実行結果を証拠としてIssueへ戻す。
+prompt: >-
+  Open issuesを取得する。各Issueについて現在のテストを実行し、
+  最新の失敗したActions runがあればjob/logを取得する。
+  推測ではなくIssue本文・テスト結果・Actionsログを根拠として
+  デバッグレポートをIssueコメントへ記録する。
+constraints:
+  - Issue本文を勝手に書き換えない
+  - コードを自動変更しない
+  - 推測と観測結果を混同しない
+  - 巨大なログをIssueへ貼らず末尾の関連部分だけを記録する
+  - GitHub Actionsの権限は必要最小限にする
+tools:
+  - github.issues.list
+  - github.actions.runs.list
+  - github.actions.jobs.list
+  - github.actions.jobs.logs
+  - github.issue.comment
+success:
+  - Open issues are discovered from the repository
+  - Test and syntax results are recorded for each target issue
+  - Latest failed Actions evidence is recorded when available
+  - A reproducible debug report is posted back to the issue
+  - No source files are modified by the debug workflow
