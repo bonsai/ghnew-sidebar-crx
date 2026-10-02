@@ -4,6 +4,10 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+  issues: write
+
 jobs:
   smoke:
     runs-on: ubuntu-latest
@@ -16,3 +20,20 @@ jobs:
         run: node --check app.js
       - name: Run smoke tests
         run: node tests/smoke.mjs
+      - name: Create debug issue on failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          title="debug: test failure in commit ${GITHUB_SHA}"
+          existing=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --search "debug: test failure" --json number --limit 1)
+          if [[ $(printf '%s' "$existing" | jq 'length') -eq 0 ]]; then
+            gh issue create --repo "$GITHUB_REPOSITORY" --title "$title" --label "bug" --body "## Automated failure
+
+- Workflow: test
+- Commit: ${GITHUB_SHA}
+- Run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}
+
+The debug workflow will reproduce the failure and apply only a verified minimal fix."
+          fi
